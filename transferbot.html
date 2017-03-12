@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Conversational banking example</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<link rel="stylesheet" href="custom.css">
+
+</head>
+
+<body>
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Conversational banking example</a>
+			</div>
+		</div>
+	</nav>
+
+
+	<div id="app" class="container">
+		<div class="row">
+			<div class="col-md-5">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<span class="glyphicon glyphicon-comment"></span> Chat
+					</div>
+					<div id="chatpanel" class="panel-body fixed-panel">
+						<ul class="chat" v-for="message in messages">
+							<li v-if="(message.actor === 'user')" class="left clearfix"><span class="chat-img pull-left">
+                            <img src="assets/user3-50px.png" alt="User Avatar" class="img-circle">
+                        </span>
+								<div class="chat-body clearfix">
+									<div class="header">
+										<strong class="primary-font">You</strong> <small class="pull-right text-muted">
+                                        <span class="glyphicon glyphicon-time"></span>{{ since (message.timestamp) }}</small>
+									</div>
+									<p>
+										{{ message.mesg }}
+									</p>
+								</div>
+							</li>
+							<li v-if="(message.actor === 'agent')" class="right clearfix"><span class="chat-img pull-right">
+                            <img src="assets/accountant-50px.png" alt="Agent Avatar" class="img-circle">
+                        </span>
+								<div class="chat-body clearfix">
+									<div class="header">
+										<small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{ since (message.timestamp) }}</small>
+										<strong class="pull-right primary-font">Agent</strong>
+									</div>
+									<p>
+										{{ message.mesg }}
+									</p>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="panel-footer">
+						<div class="input-group">
+							<input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." v-model='mesg' @keyup.enter="send(mesg)">
+							<span class="input-group-btn">
+                            <button @click="send(mesg)" class="btn btn-warning btn-sm" id="btn-chat">
+                                Send</button>
+                        </span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<span class="glyphicon glyphicon-list-alt"></span> Balances
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Account</th>
+									<th>Balance</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="account in accounts">
+									<td>{{ account.label }} </td>
+									<td>{{ toFixed(account.balance,2) }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<span class="glyphicon glyphicon-list-alt"></span> Addressbook
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Alias(es)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="address in addressBook">
+									<td>{{ address.name }}</td>
+									<td>{{ address.aliases }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<span class="glyphicon glyphicon-comment"></span> Examples
+					</div>
+					<div class="panel-body">
+						{{ example }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue.js"></script>
+	<script src="staticData.js"></script>
+	<script src="app.js"></script>
+</body>
+
+</html>
