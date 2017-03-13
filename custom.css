@@ -2,3 +2,8 @@
   height:400px;
   overflow-y:scroll;
 }
+
+.mic {
+  vertical-align: bottom;
+  height: 40px;
+}

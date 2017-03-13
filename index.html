@@ -8,6 +8,7 @@
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 	<link rel="stylesheet" href="custom.css">
+	<link rel="shortcut icon" sizes="196x196" href="assets/accountant-196px.png">
 
 </head>
 
@@ -56,15 +57,25 @@
 									</p>
 								</div>
 							</li>
+							<li v-if="(message.actor === 'speech')" class="left clearfix">
+								<div class="chat-body clearfix">
+									<p>
+										{{ message.mesg }}
+									</p>
+								</div>
+							</li>
 						</ul>
 					</div>
 					<div class="panel-footer">
 						<div class="input-group">
-							<input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." v-model='mesg' @keyup.enter="send(mesg)">
+							<input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." v-model='mesg' @keyup.enter="send()">
 							<span class="input-group-btn">
-                            <button @click="send(mesg)" class="btn btn-warning btn-sm" id="btn-chat">
+                            <button @click="send()" class="btn btn-warning btn-sm" id="btn-chat">
                                 Send</button>
                         </span>
+							<img class="mic" v-if="mic.status === mic.inactive" src="assets/mic.gif" @click=micClicked></img>
+							<img class="mic img-circle" v-if="mic.status === mic.active" src="assets/mic-animate.gif" @click=micClicked></img>
+							<img class="mic" v-if="mic.status === mic.blocked" src="assets/mic-slash.gif" @click=micClicked></img>
 						</div>
 					</div>
 				</div>
@@ -127,6 +138,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue.js"></script>
+	<script2 src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue.min.js" integrity="sha256-+lq3KPqEFQg/58sDzkrt3VflAlGyJF2MZgOObJkUF2M=" crossorigin="anonymous"></script2>
 	<script src="staticData.js"></script>
 	<script src="app.js"></script>
 </body>

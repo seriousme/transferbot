@@ -32,7 +32,7 @@ function dateSince (date) {
 }
 
 function accountById (id) {
-  return appData.accounts.filter(function(item){ return item.id === id })[0]
+  return appData.accounts.filter(function (item) { return item.id === id })[0]
 }
 
 function showLatest () {
@@ -111,13 +111,108 @@ function askApiIO (text) {
   })
 }
 
-function setResponse (mesg) {
+function addMessage (actor, mesg) {
   var now = new Date()
-  appData.messages.push({actor: 'agent', timestamp: now, mesg: mesg})
+  appData.messages.push({actor: actor, timestamp: now, mesg: mesg})
   showLatest()
 }
 
+function setResponse (mesg) {
+  addMessage('agent', mesg)
+}
+
+function speechButton (event) {
+  if (appData.mic.status === appData.mic.active) {
+    recognition.stop()
+    return
+  }
+  recognition.lang = config.locale
+  recognition.start()
+  ignoreOnEnd = false
+  appData.mic.status = appData.mic.blocked
+  // addMessage('speech', config.strings.infoSpeechAllow)
+}
+
+function sendMesg () {
+  var mesg = appData.mesg
+  if (mesg === '') {
+    return
+  }
+  addMessage('user', mesg)
+  askApiIO(mesg)
+  appData.mesg = ''
+}
+
+// main code starts here
+
 var guid = generateGuid()
+appData.mic = {
+  status: 'notavailable',
+  inactive: 'inactive',
+  active: 'active',
+  blocked: 'blocked',
+  next: {
+    inactive: 'active',
+    active: 'blocked',
+    blocked: 'inactive'
+  }
+}
+
+// enable the speechbutton if the browser supports it
+var recognition
+var ignoreOnEnd
+if ('webkitSpeechRecognition' in window) {
+  appData.mic.status = appData.mic.inactive
+  recognition = new webkitSpeechRecognition()
+  recognition.continuous = false
+  recognition.interimResults = false
+
+  recognition.onstart = function () {
+    // addMessage('speech', config.strings.infoSpeakNow)
+    appData.mic.status = appData.mic.active
+  }
+
+  recognition.onerror = function (event) {
+    if (event.error === 'no-speech') {
+      appData.mic.status = appData.mic.inactive
+      addMessage('speech', config.strings.infoNoSpeech)
+    }
+    if (event.error === 'audio-capture') {
+      appData.mic.status = appData.mic.inactive
+      addMessage('speech', config.strings.infoNoMicrophone)
+    }
+    if (event.error === 'not-allowed') {
+      appData.mic.status = appData.mic.blocked
+    }
+    ignoreOnEnd = true
+  }
+
+  recognition.onend = function () {
+    if (ignoreOnEnd) {
+      return
+    }
+    appData.mic.status = appData.mic.inactive
+  }
+
+  recognition.onresult = function (event) {
+    var finalTranscript = ''
+    if (typeof (event.results) === 'undefined') {
+      recognition.onend = null
+      recognition.stop()
+      appData.mic.status = appData.mic.blocked
+      return
+    }
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript
+      }
+    }
+    if (finalTranscript) {
+      appData.mesg = finalTranscript
+      sendMesg()
+    }
+  }
+}
 
 var app = new Vue({
   // We want to target the div with an id of 'events'
@@ -126,21 +221,14 @@ var app = new Vue({
   // for the application
   data: appData,
   methods: {
-    send: function (mesg) {
-      if (mesg === '') {
-        return
-      }
-      var now = new Date()
-      appData.messages.push({actor: 'user', timestamp: now, mesg: mesg})
-      askApiIO(mesg)
-      appData.mesg = ''
-    },
+    send: sendMesg,
     since: function (data) {
       return dateSince(data)
     },
     toFixed: function (num, precision) {
       return Number(num).toFixed(precision)
-    }
+    },
+    micClicked: speechButton
   }
 })
 
@@ -154,5 +242,3 @@ setInterval(function () {
     exampleCnt = 0
   }
 }, 3000)
-
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue.min.js" integrity="sha256-+lq3KPqEFQg/58sDzkrt3VflAlGyJF2MZgOObJkUF2M=" crossorigin="anonymous"></script>

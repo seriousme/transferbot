@@ -1,6 +1,7 @@
 
 var staticDataEn = {
   language: 'en',
+  locale: 'en-US',
   appData: {
     accounts: [
      { label: 'Current', id: 'current account', balance: 1000 },
@@ -42,7 +43,11 @@ var staticDataEn = {
   strings: {
     internalError: 'Internal Server Error',
     savingsAccountBalance: 'The balance of your savings account is currently ',
-    currentAccountBalance: 'The balance of your current account is currently '
+    currentAccountBalance: 'The balance of your current account is currently ',
+    infoSpeakNow: 'Speak now',
+    infoNoSpeech: 'No speech detected',
+    infoSpeechBlocked: 'Permission to use microphone is blocked',
+    infoSpeechAllow: 'Allow microphone access'
   }
 }
 
