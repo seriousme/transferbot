@@ -3,10 +3,16 @@ var staticDataEn = {
   language: 'en',
   locale: 'en-US',
   appData: {
-    accounts: [
-     { label: 'Current', id: 'current account', balance: 1000 },
-     { label: 'Savings', id: 'savings account', balance: 0 }
-    ],
+    accounts: {
+      'currentAccountBalance': {
+        label: 'Current',
+        balance: 1000
+      },
+      'savingsAccountBalance': {
+        label: 'Savings',
+        balance: 0
+      }
+    },
     addressBook: [
     { name: 'Savings account', aliases: ['Savings'] },
     { name: 'Paul', aliases: [] },
@@ -42,8 +48,6 @@ var staticDataEn = {
   clientToken: '5e892d9acb9d4d03a6e82814017fdfc5',
   strings: {
     internalError: 'Internal Server Error',
-    savingsAccountBalance: 'The balance of your savings account is currently ',
-    currentAccountBalance: 'The balance of your current account is currently ',
     infoSpeakNow: 'Speak now',
     infoNoSpeech: 'No speech detected',
     infoSpeechBlocked: 'Permission to use microphone is blocked',

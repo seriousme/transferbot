@@ -31,10 +31,6 @@ function dateSince (date) {
   return Math.floor(seconds) + ' seconds'
 }
 
-function accountById (id) {
-  return appData.accounts.filter(function (item) { return item.id === id })[0]
-}
-
 function showLatest () {
   $('#chatpanel').stop().animate({
     scrollTop: $('#chatpanel')[0].scrollHeight
@@ -49,41 +45,19 @@ function generateGuid () {
   })
 }
 
-// very simplistic accounting system
-function book (data) {
-  if (data.Account === 'current account') {
-    return
-  }
-  var amount = data.Amount
-  if (typeof (amount) === 'object') {
-    amount = data.Amount.amount
-  }
-
-  accountById('current account').balance -= amount
-  if (data.Account === 'savings account') {
-    accountById('savings account').balance += amount
-  }
-}
-
 function handleSuccess (data) {
-  console.log('action', data.result.action)
-  if ((data.result.action === 'account.transfer.create') &&
-        (data.result.actionIncomplete === false)) {
-    appData.transaction = data.result.parameters
-  } else if (data.result.action === 'account.transfer.confirm') {
-    book(appData.transaction)
-  } else {
-    appData.transaction = ''
-  }
-  console.log(data)
-  if (data.result.action === 'account.balance') {
-    if (data.result.parameters.Account === 'savings account') {
-      setResponse(config.strings.savingsAccountBalance + accountById('savings account').balance)
-    } else {
-      setResponse(config.strings.currentAccountBalance + accountById('current account').balance)
+  var fulfillment = data.result.fulfillment
+  // put the bots answer on screen
+  setResponse(fulfillment.speech)
+  // do we have new balance info ?
+
+  if (typeof (fulfillment.data) === 'object') {
+    // we got new balance info
+    var balances = fulfillment.data.transferBot
+    // update our balances
+    for (var account in appData.accounts) {
+      appData.accounts[account].balance = balances[account]
     }
-  } else {
-    setResponse(data.result.fulfillment.speech)
   }
 }
 
