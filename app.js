@@ -224,7 +224,7 @@ askApiIO('')
 var exampleCnt = 0
 setInterval(function () {
   appData.example = config.examples[exampleCnt++]
-  if (exampleCnt > config.examples.length) {
+  if (exampleCnt >= config.examples.length) {
     exampleCnt = 0
   }
 }, 3000)
