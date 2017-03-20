@@ -1,6 +1,20 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 admin.initializeApp(functions.config().firebase)
+const staticData = {
+  'en': {
+    'currentAccount': 'current account',
+    'savingsAccount': 'savings account',
+    'placeholder': 'currently not available',
+    'currency': ''
+  },
+  'nl': {
+    'currentAccount': 'betaalrekening',
+    'savingsAccount': 'spaarrekening',
+    'placeholder': 'niet beschikbaar',
+    'currency': ' Euro'
+  }
+}
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/functions/write-firebase-functions
@@ -22,41 +36,29 @@ function getSessionData (sessionId) {
             lastUpdate: now,
             sessionId: sessionId
           }
-          admin.database().ref('session/' + sessionId).set(data)
           resolve(data)
         }
       })
   })
 }
 
-function storeTransAction (body) {
-  const data = body.result
+function bookTransAction (body) {
   return new Promise((resolve, reject) => {
     getSessionData(body.sessionId).then((session) => {
-      if (data.actionIncomplete === false) {
-        const account = data.parameters.Account
-        var amount = data.parameters.Amount
-        if (typeof (amount) === 'object') {
-          amount = data.parameters.Amount.amount
-        }
-        session.transaction = {Account: account, amount: amount}
-        admin.database().ref('session/' + body.sessionId).set(session)
+      const data = body.result
+      const account = data.parameters.Account
+      var amount = data.parameters.Amount
+      if (typeof (amount) === 'object') {
+        amount = data.parameters.Amount.amount
       }
-      resolve()
+      session.currentAccountBalance -= amount
+      if (account === staticData[body.lang].savingsAccount) {
+        session.savingsAccountBalance += amount
+      }
+      data.lastUpdate = Number(new Date())
+      admin.database().ref('session/' + body.sessionId).set(session)
+      resolve(session)
     })
-  })
-}
-
-function bookTransAction (data) {
-  return new Promise((resolve, reject) => {
-    data.currentAccountBalance -= data.transaction.amount
-    if (data.transaction.Account === 'savings account') {
-      data.savingsAccountBalance += data.transaction.amount
-    }
-    data.lastUpdate = Number(new Date())
-    data.transaction = null
-    admin.database().ref('session/' + data.sessionId).set(data)
-    resolve(data)
   })
 }
 
@@ -65,10 +67,10 @@ function getBalance (body) {
     getSessionData(body.sessionId).then((session) => {
       const data = body.result
       var balance = null
-      if (data.parameters.Account === 'current account') {
+      if (data.parameters.Account === staticData[body.lang].currentAccount) {
         balance = session.currentAccountBalance
       }
-      if (data.parameters.Account === 'savings account') {
+      if (data.parameters.Account === staticData[body.lang].savingsAccount) {
         balance = session.savingsAccountBalance
       }
       if (balance !== null) {
@@ -84,14 +86,9 @@ exports.transferBot = functions.https.onRequest((request, response) => {
   const body = request.body
   const result = body.result
   const action = result.action
-  if (action === 'account.transfer.create') {
-    storeTransAction(body).then(
-      () => {
-        response.send(result.fulfillment)
-      })
-  }
+
   if (action === 'account.transfer.confirm') {
-    getSessionData(body.sessionId).then(bookTransAction).then(
+    bookTransAction(body).then(
       (data) => {
         response.send({speech: result.fulfillment.speech, data: { transferBot: data }})
       })
@@ -99,7 +96,7 @@ exports.transferBot = functions.https.onRequest((request, response) => {
   if (action === 'account.balance') {
     getBalance(body).then(
     (balance) => {
-      const speech = result.fulfillment.speech.replace('currently not available', balance)
+      const speech = result.fulfillment.speech.replace(staticData[body.lang].placeholder, balance) + staticData[body.lang].currency
       response.send({ speech: speech })
     }).catch(
       (balance) => {

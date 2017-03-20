@@ -1,6 +1,4 @@
 
-var config = staticData.en
-var appData = config.appData
 
 var baseUrl = 'https://api.api.ai/v1/'
 
@@ -65,7 +63,7 @@ function askApiIO (text) {
   var query
   if (text === '') {
     // start conversation
-    query = JSON.stringify({ event: { name: 'WELCOME' }, lang: 'en', sessionId: guid })
+    query = JSON.stringify({ event: { name: 'WELCOME' }, lang: config.language, sessionId: guid })
   } else {
     query = JSON.stringify({ query: text, lang: config.language, sessionId: guid })
   }
@@ -117,9 +115,22 @@ function sendMesg () {
   appData.mesg = ''
 }
 
+function changeLanguage (lang,init) {
+  console.log('changing language to', lang)
+  config = staticData[lang]
+  for (var item in config.appData) {
+    appData[item] = config.appData[item]
+  }
+  if (!init) { askApiIO('') }
+}
 // main code starts here
+var config = {}
+var appData = {}
+
+changeLanguage('en',true)
 
 var guid = generateGuid()
+
 appData.mic = {
   status: 'notavailable',
   inactive: 'inactive',
@@ -202,6 +213,7 @@ var app = new Vue({
     toFixed: function (num, precision) {
       return Number(num).toFixed(precision)
     },
+    changeLanguage: changeLanguage,
     micClicked: speechButton
   }
 })

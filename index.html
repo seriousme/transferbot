@@ -13,122 +13,130 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-inverse">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">Conversational banking example</a>
+	<div id="app">
+		<nav class="navbar navbar-inverse">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">{{ labels.title }}</a>
+				</div>
+				<ul class="nav navbar-nav navbar-right">
+        		<li>
+							<a v-if="language=='en'" href="#" @click="changeLanguage('nl')">Nederlands</a>
+							<a v-if="language=='nl'" href="#" @click="changeLanguage('en')">English</a>
+						</li>
+        </ul>
 			</div>
-		</div>
-	</nav>
+		</nav>
 
 
-	<div id="app" class="container">
-		<div class="row">
-			<div class="col-md-5">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<span class="glyphicon glyphicon-comment"></span> Chat
-					</div>
-					<div id="chatpanel" class="panel-body fixed-panel">
-						<ul class="chat" v-for="message in messages">
-							<li v-if="(message.actor === 'user')" class="left clearfix"><span class="chat-img pull-left">
-                            <img src="assets/user3-50px.png" alt="User Avatar" class="img-circle">
-                        </span>
-								<div class="chat-body clearfix">
-									<div class="header">
-										<strong class="primary-font">You</strong> <small class="pull-right text-muted">
-                                        <span class="glyphicon glyphicon-time"></span>{{ since (message.timestamp) }}</small>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-5">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<span class="glyphicon glyphicon-comment"></span> Chat
+						</div>
+						<div id="chatpanel" class="panel-body fixed-panel">
+							<ul class="chat" v-for="message in messages">
+								<li v-if="(message.actor === 'user')" class="left clearfix"><span class="chat-img pull-left">
+	                            <img src="assets/user3-50px.png" alt="User Avatar" class="img-circle">
+	                        </span>
+									<div class="chat-body clearfix">
+										<div class="header">
+											<strong class="primary-font">{{ labels.you }}</strong> <small class="pull-right text-muted">
+	                                        <span class="glyphicon glyphicon-time"></span>{{ since (message.timestamp) }}</small>
+										</div>
+										<p>
+											{{ message.mesg }}
+										</p>
 									</div>
-									<p>
-										{{ message.mesg }}
-									</p>
-								</div>
-							</li>
-							<li v-if="(message.actor === 'agent')" class="right clearfix"><span class="chat-img pull-right">
-                            <img src="assets/accountant-50px.png" alt="Agent Avatar" class="img-circle">
-                        </span>
-								<div class="chat-body clearfix">
-									<div class="header">
-										<small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{ since (message.timestamp) }}</small>
-										<strong class="pull-right primary-font">Agent</strong>
+								</li>
+								<li v-if="(message.actor === 'agent')" class="right clearfix"><span class="chat-img pull-right">
+	                            <img src="assets/accountant-50px.png" alt="Agent Avatar" class="img-circle">
+	                        </span>
+									<div class="chat-body clearfix">
+										<div class="header">
+											<small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{ since (message.timestamp) }}</small>
+											<strong class="pull-right primary-font">Agent</strong>
+										</div>
+										<p>
+											{{ message.mesg }}
+										</p>
 									</div>
-									<p>
-										{{ message.mesg }}
-									</p>
-								</div>
-							</li>
-							<li v-if="(message.actor === 'speech')" class="left clearfix">
-								<div class="chat-body clearfix">
-									<p>
-										{{ message.mesg }}
-									</p>
-								</div>
-							</li>
-						</ul>
-					</div>
-					<div class="panel-footer">
-						<div class="input-group">
-							<input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." v-model='mesg' @keyup.enter="send()">
-							<span class="input-group-btn">
-                            <button @click="send()" class="btn btn-warning btn-sm" id="btn-chat">
-                                Send</button>
-                        </span>
-							<img class="mic" v-if="mic.status === mic.inactive" src="assets/mic.gif" @click=micClicked></img>
-							<img class="mic img-circle" v-if="mic.status === mic.active" src="assets/mic-animate.gif" @click=micClicked></img>
-							<img class="mic" v-if="mic.status === mic.blocked" src="assets/mic-slash.gif" @click=micClicked></img>
+								</li>
+								<li v-if="(message.actor === 'speech')" class="left clearfix">
+									<div class="chat-body clearfix">
+										<p>
+											{{ message.mesg }}
+										</p>
+									</div>
+								</li>
+							</ul>
+						</div>
+						<div class="panel-footer">
+							<div class="input-group">
+								<input id="btn-input" type="text" class="form-control input-sm" :placeholder="labels.placeholder" v-model='mesg' @keyup.enter="send()">
+								<span class="input-group-btn">
+	                            <button @click="send()" class="btn btn-warning btn-sm" id="btn-chat">
+	                                {{ labels.send }}</button>
+	                        </span>
+								<img class="mic" v-if="mic.status === mic.inactive" src="assets/mic.gif" @click=micClicked></img>
+								<img class="mic img-circle" v-if="mic.status === mic.active" src="assets/mic-animate.gif" @click=micClicked></img>
+								<img class="mic" v-if="mic.status === mic.blocked" src="assets/mic-slash.gif" @click=micClicked></img>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-md-5">
-				<div class="panel panel-info">
-					<div class="panel-heading">
-						<span class="glyphicon glyphicon-list-alt"></span> Balances
+				<div class="col-md-5">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<span class="glyphicon glyphicon-list-alt"></span> {{ labels.balances }}
+						</div>
+						<div class="panel-body">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th>{{ labels.account }}</th>
+										<th>{{ labels.balance }}</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="account in accounts">
+										<td>{{ account.label }} </td>
+										<td>{{ toFixed(account.balance,2) }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
-					<div class="panel-body">
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th>Account</th>
-									<th>Balance</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr v-for="account in accounts">
-									<td>{{ account.label }} </td>
-									<td>{{ toFixed(account.balance,2) }}</td>
-								</tr>
-							</tbody>
-						</table>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<span class="glyphicon glyphicon-list-alt"></span> {{ labels.addressbook }}
+						</div>
+						<div class="panel-body">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th>{{ labels.name }}</th>
+										<th>{{ labels.aliases }}</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="address in addressBook">
+										<td>{{ address.name }}</td>
+										<td>{{ address.aliases }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
-				</div>
-				<div class="panel panel-info">
-					<div class="panel-heading">
-						<span class="glyphicon glyphicon-list-alt"></span> Addressbook
-					</div>
-					<div class="panel-body">
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Alias(es)</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr v-for="address in addressBook">
-									<td>{{ address.name }}</td>
-									<td>{{ address.aliases }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<div class="panel panel-info">
-					<div class="panel-heading">
-						<span class="glyphicon glyphicon-comment"></span> Examples
-					</div>
-					<div class="panel-body" @click="mesg = example;send()">
-						{{ example }}
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<span class="glyphicon glyphicon-comment"></span> {{ labels.examples }}
+						</div>
+						<div class="panel-body" @click="mesg = example;send()">
+							{{ example }}
+						</div>
 					</div>
 				</div>
 			</div>
