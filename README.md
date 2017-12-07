@@ -8,4 +8,4 @@ The transferbot is composed of 3 parts:
 - the (very simplistic) banking backend hosted at https://firebase.google.com/ to maintain balances
 - the web frontend hosted using gitHub pages, including voice recognition when using Chrome using the selected language
 
-The frontend can be easily replaced by other [channels](https://docs.api.ai/docs/integrations) an example being the [default API.ai web agent](https://console.dialogflow.com/api-client/demo/embedded/transferbot) and the [Dutch API.ai web agent](https://console.dialogflow.com/api-client/demo/embedded/transferbotNL)
+The frontend can be easily replaced by other [channels](https://docs.api.ai/docs/integrations) an example being the [default dialogflow.com web agent](https://console.dialogflow.com/api-client/demo/embedded/transferbot) and the [Dutch dialogflow.com web agent](https://console.dialogflow.com/api-client/demo/embedded/transferbotNL)
