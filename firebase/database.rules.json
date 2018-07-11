@@ -1,6 +1,6 @@
 {
   "rules": {
-    ".read": "auth != null",
-    ".write": "auth != null"
+    ".read": "auth != null && auth.token.isAdmin == true",
+    ".write": "auth != null && auth.token.isAdmin == true"
   }
 }
