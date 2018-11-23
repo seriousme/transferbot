@@ -1,4 +1,4 @@
-var baseUrl = "https://api.dialogflow.com/v1/";
+var baseUrl = "https://dialogflow.googleapis.com/v2beta1/projects/";
 
 function dateSince(date) {
   var seconds = Math.floor((new Date() - date) / 1000);
@@ -66,27 +66,43 @@ function askApiIO(text) {
   var query;
   if (text === "") {
     // start conversation
-    query = JSON.stringify({
-      event: { name: "WELCOME" },
-      lang: config.language,
-      sessionId: guid
-    });
+    query = {
+      queryParams: {
+        contexts: [],
+        sessionEntityTypes: []
+      },
+      queryInput: {
+        event: {
+          name: "WELCOME",
+          languageCode: config.language
+        }
+      }
+    };
   } else {
-    query = JSON.stringify({
-      query: text,
-      lang: config.language,
-      sessionId: guid
-    });
+    query = {
+      queryParams: {
+        contexts: [],
+        sessionEntityTypes: []
+      },
+      queryInput: {
+        text: {
+          text: query,
+          languageCode: config.language
+        }
+      }
+    };
   }
   $.ajax({
     type: "POST",
-    url: baseUrl + "query?v=20150910",
+    url: `${baseUrl}/${
+      config.projectId
+    }/agent/sessions/${sessionId}:detectIntent`,
     contentType: "application/json; charset=utf-8",
     dataType: "json",
     headers: {
       Authorization: "Bearer " + config.clientToken
     },
-    data: query,
+    data: JSON.stringify(query),
     success: handleSuccess,
     error: function() {
       setResponse(config.strings.internalError);
@@ -142,7 +158,7 @@ var appData = {};
 
 changeLanguage("en", true);
 
-var guid = generateGuid();
+var sessionId = generateGuid();
 
 appData.mic = {
   status: "notavailable",
